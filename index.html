@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120d0e">
+  <title>TURBO GRIND</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root { color-scheme: dark; --bg:#100c0d; --panel:#1b1416; --panel2:#24191c; --red:#d94343; --red2:#8f252b; --muted:#a99b9d; --line:#38272b; }
+    * { box-sizing:border-box }
+    body { margin:0; min-height:100vh; color:#f5eeee; background:radial-gradient(ellipse at 50% -15%,#542027 0%,#1b1013 35%,var(--bg) 72%); font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif; padding: max(18px,env(safe-area-inset-top)) 16px max(26px,env(safe-area-inset-bottom)); }
+    .app { max-width:520px; margin:auto }
+    .top { display:flex; align-items:center; justify-content:space-between; margin:6px 2px 22px }
+    .brand { font-weight:950; letter-spacing:2.6px; font-size:19px }
+    .brand span { color:var(--red) }
+    .tag { color:#e9b7b7; border:1px solid #71363d; background:#351b20; padding:6px 10px; border-radius:99px; font-size:10px; letter-spacing:1px; font-weight:800 }
+    .eyebrow { color:#c58d91; letter-spacing:2px; font-size:10px; font-weight:800; margin-bottom:7px }
+    h1 { font-size:30px; line-height:1.05; margin:0; letter-spacing:-1px }
+    .sub { color:var(--muted); font-size:13px; margin:8px 0 20px }
+    .card { background:linear-gradient(145deg,rgba(43,28,32,.97),rgba(24,17,19,.98)); border:1px solid var(--line); border-radius:18px; padding:17px; box-shadow:0 12px 35px #0005; margin-bottom:13px }
+    .progress-head { display:flex; align-items:end; justify-content:space-between; gap:12px }
+    .count { font-size:42px; font-weight:950; letter-spacing:-2px; line-height:1 }
+    .count small { color:#a99b9d; font-size:17px; letter-spacing:0 }
+    .percent { color:#f08a8a; font-weight:850; font-size:14px }
+    .track { height:11px; background:#100b0d; border:1px solid #493137; border-radius:20px; overflow:hidden; margin:16px 0 10px }
+    .fill { height:100%; width:0%; background:linear-gradient(90deg,#8d2029,#f05b57); border-radius:20px; transition:width .25s }
+    .hint { color:var(--muted); font-size:11px; display:flex; justify-content:space-between }
+    .stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:13px }
+    .stat { background:#1b1416; border:1px solid var(--line); border-radius:15px; padding:14px }
+    .stat strong { display:block; font-size:25px; margin-bottom:3px }
+    .stat span { color:var(--muted); font-size:11px }
+    .section-title { font-size:13px; font-weight:850; letter-spacing:1.1px; margin:3px 2px 11px }
+    .add-row { display:flex; gap:9px; align-items:center; margin-top:14px }
+    input { min-width:0; width:76px; background:#100b0d; border:1px solid #503238; color:white; border-radius:12px; padding:13px 10px; font-size:16px; text-align:center; outline:none }
+    button { border:0; border-radius:12px; padding:13px 15px; font-weight:850; color:white; background:linear-gradient(135deg,#e14c4c,#a92c35); cursor:pointer; font-size:13px }
+    button:active { transform:scale(.98) }
+    button.secondary { background:#302125; border:1px solid #54343b; color:#e9d9da }
+    button:disabled { opacity:.35; cursor:not-allowed }
+    .add-row button { flex:1 }
+    .section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px }
+    .section-head button { padding:8px 10px; font-size:11px }
+    .history { display:grid; gap:8px }
+    .entry { display:flex; justify-content:space-between; align-items:center; background:#171113; border:1px solid #302226; border-radius:12px; padding:11px 12px; font-size:12px }
+    .entry b { font-size:14px }
+    .empty { color:var(--muted); text-align:center; padding:16px 8px; font-size:12px; border:1px dashed #493137; border-radius:12px }
+    .footer { text-align:center; color:#75696b; font-size:10px; margin:18px 0 0; line-height:1.6 }
+    .toast { position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:#eee; color:#211; padding:10px 15px; border-radius:99px; font-size:12px; font-weight:800; opacity:0; pointer-events:none; transition:opacity .2s }
+    .toast.show { opacity:1 }
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="top"><div class="brand">TURBO <span>GRIND</span></div><div class="tag">DOTA 2 • TRACKER</div></header>
+  <div class="eyebrow">YOUR ROAD TO 150 GAMES</div>
+  <h1>Каждая игра<br>приближает к цели.</h1>
+  <p class="sub">Личный дневник турбо-матчей. Отмечай результат после игры.</p>
+
+  <section class="card">
+    <div class="progress-head">
+      <div><div class="eyebrow">ОБЩИЙ ПРОГРЕСС</div><div class="count"><span id="total">0</span><small> / 150</small></div></div>
+      <div class="percent" id="percent">0%</div>
+    </div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="hint"><span id="remaining">Осталось 150 игр</span><span>Цель: 150</span></div>
+    <div class="add-row">
+      <input id="amount" type="number" inputmode="numeric" min="1" max="150" value="1" aria-label="Количество игр">
+      <button id="add">＋ ДОБАВИТЬ ИГРЫ</button>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><strong id="today">0</strong><span>СЫГРАНО СЕГОДНЯ</span></div>
+    <div class="stat"><strong id="week">0</strong><span>ЗА ПОСЛЕДНИЕ 7 ДНЕЙ</span></div>
+  </div>
+
+  <section class="card">
+    <div class="section-head"><div class="section-title">ИСТОРИЯ МАТЧЕЙ</div><button class="secondary" id="undo">ОТМЕНИТЬ ПОСЛЕДНЕЕ</button></div>
+    <div class="history" id="history"><div class="empty">Пока нет записей. Добавь первую игру!</div></div>
+  </section>
+  <p class="footer">TURBO GRIND · ЛИЧНЫЙ ПРОГРЕСС-ТРЕКЕР<br>В этой стартовой версии данные хранятся на этом устройстве.</p>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+  const TARGET = 150, KEY = 'turbo-grind-v1';
+  const tg = window.Telegram?.WebApp;
+  tg?.ready(); tg?.expand();
+  const $ = id => document.getElementById(id);
+  let entries = [];
+  try { entries = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { entries = []; }
+  const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const todayKey = dateKey(new Date());
+  const fmt = key => { const [y,m,d] = key.split('-'); return `${d}.${m}.${y}`; };
+  function save(){ localStorage.setItem(KEY, JSON.stringify(entries)); render(); }
+  function toast(msg){ $('toast').textContent=msg; $('toast').classList.add('show'); setTimeout(()=>$('toast').classList.remove('show'),1700); }
+  function render(){
+    const total = entries.reduce((s,e)=>s+e.count,0);
+    const pct = Math.min(100, total/TARGET*100);
+    $('total').textContent=total; $('percent').textContent=`${pct.toFixed(1)}%`;
+    $('fill').style.width=`${pct}%`; $('remaining').textContent=total>=TARGET?'ЦЕЛЬ ДОСТИГНУТА!':`Осталось ${TARGET-total} игр`;
+    $('today').textContent=entries.filter(e=>e.date===todayKey).reduce((s,e)=>s+e.count,0);
+    const weekStart = new Date(); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate()-6);
+    $('week').textContent=entries.filter(e=>new Date(e.date+'T00:00:00')>=weekStart).reduce((s,e)=>s+e.count,0);
+    $('undo').disabled=entries.length===0;
+    const sorted=[...entries].reverse().slice(0,12);
+    $('history').innerHTML=sorted.length?sorted.map(e=>`<div class="entry"><span>${fmt(e.date)} · ${e.time}</span><b>+${e.count} ${e.count===1?'игра':'игр'}</b></div>`).join(''):'<div class="empty">Пока нет записей. Добавь первую игру!</div>';
+  }
+  $('add').addEventListener('click',()=>{
+    const count=Math.floor(Number($('amount').value));
+    if(!Number.isFinite(count)||count<1||count>150){toast('Введи число от 1 до 150');return;}
+    entries.push({count,date:todayKey,time:new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})});
+    save(); $('amount').value=1; toast(`Добавлено игр: ${count}`);
+  });
+  $('undo').addEventListener('click',()=>{if(!entries.length)return; const e=entries.pop(); save(); toast(`Отменено: ${e.count} игр`);});
+  render();
+})();
+</script>
+</body>
+</html>

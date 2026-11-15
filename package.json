@@ -1,0 +1,16 @@
+{
+  "name": "turbo_grind_miniapp",
+  "version": "1.0.0",
+  "description": "- прогресс до 150 игр; - добавление сразу нескольких игр; - статистика за сегодня и последние 7 дней; - история записей; - отмена последнего добавления; - адаптивный тёмно-красный интерфейс; - подключение Telegram Web Apps SDK.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
